@@ -146,7 +146,7 @@ export default class Compose extends Component {
                      }}
                      onClick={() => {
                         var time = moment();
-                        if (this.state.to !== '' && this.state.msg !== '') {
+                        if (this.state.to !== '') {
                            if (localStorage.getItem('Drafts') === null) {
                               localStorage.setItem(
                                  'Drafts',

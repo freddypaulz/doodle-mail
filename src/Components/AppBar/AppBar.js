@@ -15,6 +15,7 @@ import { TextField, InputAdornment } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import ModeCommentIcon from '@material-ui/icons/ModeComment';
 import NotificationsIcon from '@material-ui/icons/Notifications';
+import AddIcon from '@material-ui/icons/Add';
 const useStyles = makeStyles((theme) => ({
    root: {
       flexGrow: 1,
@@ -117,17 +118,6 @@ export default function ButtonAppBar(props) {
                      setAnchorE1(null);
                   }}
                >
-                  {/* <MenuItem
-                     style={{
-                        display: 'flex',
-                        letterSpacing: '5px',
-                        justifyContent: 'center',
-                        textTransform: 'uppercase',
-                     }}
-                  >
-                     
-                     {JSON.parse(sessionStorage.getItem('user')).first_name}
-                  </MenuItem> */}
                   {JSON.parse(sessionStorage.getItem('users')).length > 0
                      ? JSON.parse(sessionStorage.getItem('users')).map(
                           (e, index) => {
@@ -199,7 +189,7 @@ export default function ButtonAppBar(props) {
                         justifyContent: 'flex-start',
                      }}
                   >
-                     <ExitToAppIcon
+                     <AddIcon
                         style={{
                            fontSize: '20px',
                            paddingRight: '5px',
