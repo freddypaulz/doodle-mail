@@ -5,7 +5,7 @@ import AccountBoxOutlinedIcon from '@material-ui/icons/AccountBoxOutlined';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import auth from '../../Components/Auth/auth';
 import { Link } from 'react-router-dom';
-
+import axios from 'axios';
 const styles = {
    box: {
       display: 'flex',
@@ -115,58 +115,58 @@ export default class Login extends Component {
                            errors: [],
                            success: [],
                         });
-                        var Users = JSON.parse(localStorage.getItem('Users'));
-                        // alert(Users);
-                        var flag = true;
                         var dup = false;
-                        Users.forEach((user) => {
-                           if (
-                              this.state.user_name + '@mail.com' ===
-                                 user.user_name &&
-                              this.state.password === user.password
-                           ) {
-                              auth.login(true);
-                              sessionStorage.setItem(
-                                 'user',
-                                 JSON.stringify(user)
-                              );
-                              //alert(sessionStorage.getItem('users'));
-                              if (sessionStorage.getItem('users') === null) {
-                                 //var temp = JSON.parse(sessionStorage.getItem('users'))
+                        axios
+                           .post('/users/login', {
+                              user_name: this.state.user_name + '@mail.com',
+                              password: this.state.password,
+                           })
+                           .then((res) => {
+                              console.log(res.data);
+                              if (
+                                 res.data.user_name ===
+                                 this.state.user_name + '@mail.com'
+                              ) {
+                                 //alert('Success');
+                                 auth.login(true);
                                  sessionStorage.setItem(
-                                    'users',
-                                    JSON.stringify([])
+                                    'user',
+                                    JSON.stringify(res.data)
                                  );
-                              }
-                              var temp = JSON.parse(
-                                 sessionStorage.getItem('users')
-                              );
-                              temp.forEach((user) => {
-                                 if (
-                                    user.user_name ===
-                                    JSON.parse(sessionStorage.getItem('user'))
-                                       .user_name
-                                 ) {
-                                    dup = true;
+                                 if (sessionStorage.getItem('users') === null) {
+                                    sessionStorage.setItem(
+                                       'users',
+                                       JSON.stringify([])
+                                    );
                                  }
-                              });
-                              if (!dup) {
-                                 temp.push(user);
-                                 sessionStorage.setItem(
-                                    'users',
-                                    JSON.stringify(temp)
+                                 var temp = JSON.parse(
+                                    sessionStorage.getItem('users')
                                  );
+                                 temp.forEach((user) => {
+                                    if (
+                                       user.user_name ===
+                                       JSON.parse(
+                                          sessionStorage.getItem('user')
+                                       ).user_name
+                                    ) {
+                                       dup = true;
+                                    }
+                                 });
+                                 if (!dup) {
+                                    temp.push(res.data);
+                                    sessionStorage.setItem(
+                                       'users',
+                                       JSON.stringify(temp)
+                                    );
+                                 }
+                                 this.props.history.push('/home');
+                              } else {
+                                 console.log(res.data.message);
+                                 this.setState({
+                                    errors: res.data.message,
+                                 });
                               }
-
-                              this.props.history.push('/home');
-                              flag = false;
-                           }
-                        });
-                        if (flag) {
-                           this.setState({
-                              errors: ['User Name or Password is invalid'],
                            });
-                        }
                      }}
                   >
                      Login

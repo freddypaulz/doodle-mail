@@ -2,6 +2,7 @@ import React from 'react';
 import { PaperBoard } from '../../Components/PaperBoard/PaperBoard';
 import { Button, TextField, Box, InputAdornment } from '@material-ui/core';
 import { Redirect } from 'react-router-dom';
+import axios from 'axios';
 
 const styles = {
    box: {
@@ -143,49 +144,37 @@ export default class NewUser extends React.Component {
                            errors: [],
                         });
                         var errors = [];
-                        if (localStorage.getItem('Users') === null) {
-                           localStorage.setItem('Users', JSON.stringify([]));
-                        }
+
                         if (
                            this.state.first_name !== '' &&
                            this.state.last_name !== '' &&
-                           this.state.user_name !== ''
+                           this.state.user_name !== '' &&
+                           this.state.password !== ''
                         ) {
                            if (this.state.c_password === this.state.password) {
-                              var flag = false;
-                              var temp = JSON.parse(
-                                 localStorage.getItem('Users')
-                              );
-                              if (temp.length > 0) {
-                                 temp.forEach((element) => {
-                                    if (
-                                       element.user_name ===
-                                       this.state.user_name + '@mail.com'
-                                    ) {
-                                       errors.push('User Name Not Available');
-                                       this.setState({
-                                          errors: errors,
-                                       });
-                                       flag = true;
-                                    }
-                                 });
-                              }
-                              if (flag === false) {
-                                 temp.push({
+                              axios
+                                 .post('/users/add-user', {
                                     user_name:
                                        this.state.user_name + '@mail.com',
                                     first_name: this.state.first_name,
                                     last_name: this.state.last_name,
                                     password: this.state.password,
-                                 });
-                                 localStorage.setItem(
-                                    'Users',
-                                    JSON.stringify(temp)
-                                 );
-                                 this.setState({
-                                    redirect: true,
-                                 });
-                              }
+                                    password2: this.state.c_password,
+                                 })
+                                 .then((res) => {
+                                    console.log(res);
+                                    if (res.data.errors.length > 0) {
+                                       console.log(res.data.errors);
+                                       this.setState({
+                                          errors: [...res.data.errors],
+                                       });
+                                    } else {
+                                       this.setState({
+                                          redirect: true,
+                                       });
+                                    }
+                                 })
+                                 .catch((err) => console.log(err));
                            } else {
                               errors.push('Passwords does not match');
                               this.setState({

@@ -25,7 +25,7 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import moment from 'moment';
 import Compose from '../../Components/Compose/Compose';
-
+import axios from 'axios';
 export default class Home extends React.Component {
    constructor(props) {
       super(props);
@@ -34,12 +34,17 @@ export default class Home extends React.Component {
          anchorEl: null,
          checked: false,
          mails: [],
+         allMails: [],
+         allDrafts: [],
          sent: true,
          draft: false,
+         draftFlag: false,
+         sentFlag: false,
          mail: {},
          inboxSel: false,
          draftSel: false,
          sentSel: false,
+         status: 'loading...',
       };
       this.logout = () => {
          if (auth.logout()) {
@@ -52,19 +57,10 @@ export default class Home extends React.Component {
             'aria-controls': `simple-tabpanel-${index}`,
          };
       };
-      this.inbox = () => {
-         this.setState({
-            sent: false,
-            draft: false,
-         });
-         this.setState({
-            inboxSel: true,
-            sentSel: false,
-            draftSel: false,
-         });
-         if (localStorage.getItem('Mails')) {
+      this.setInMail = () => {
+         if (this.state.allMails.length > 0) {
             var mails = [];
-            JSON.parse(localStorage.getItem('Mails')).forEach((mail) => {
+            this.state.allMails.forEach((mail) => {
                if (
                   mail.to ===
                   JSON.parse(sessionStorage.getItem('user')).user_name
@@ -73,27 +69,24 @@ export default class Home extends React.Component {
                }
             });
             this.setState({
-               mails: mails,
+               mails: mails.reverse(),
             });
+            if (mails.length === 0) {
+               this.setState({
+                  status: 'Empty',
+               });
+            }
          } else {
             this.setState({
                mails: [],
+               status: 'Empty',
             });
          }
       };
-      this.sent = () => {
-         this.setState({
-            sent: true,
-            draft: true,
-         });
-         this.setState({
-            inboxSel: false,
-            sentSel: true,
-            draftSel: false,
-         });
-         if (localStorage.getItem('Mails')) {
+      this.setSentMail = () => {
+         if (this.state.allMails.length > 0) {
             var mails = [];
-            JSON.parse(localStorage.getItem('Mails')).forEach((mail) => {
+            this.state.allMails.forEach((mail) => {
                if (
                   mail.from ===
                   JSON.parse(sessionStorage.getItem('user')).user_name
@@ -102,27 +95,24 @@ export default class Home extends React.Component {
                }
             });
             this.setState({
-               mails: mails,
+               mails: mails.reverse(),
             });
+            if (mails.length === 0) {
+               this.setState({
+                  status: 'Empty',
+               });
+            }
          } else {
             this.setState({
                mails: [],
+               status: 'Empty',
             });
          }
       };
-      this.drafts = () => {
-         this.setState({
-            sent: true,
-            draft: true,
-         });
-         this.setState({
-            inboxSel: false,
-            sentSel: false,
-            draftSel: true,
-         });
-         if (localStorage.getItem('Drafts')) {
+      this.setDraftMail = () => {
+         if (this.state.allDrafts.length > 0) {
             var drafts = [];
-            JSON.parse(localStorage.getItem('Drafts')).forEach((draft) => {
+            this.state.allDrafts.forEach((draft) => {
                if (
                   draft.from ===
                   JSON.parse(sessionStorage.getItem('user')).user_name
@@ -131,18 +121,113 @@ export default class Home extends React.Component {
                }
             });
             this.setState({
-               mails: drafts,
+               mails: drafts.reverse(),
             });
+            if (drafts.length === 0) {
+               this.setState({
+                  status: 'Empty',
+               });
+            }
          } else {
             this.setState({
                mails: [],
+               status: 'Empty',
             });
+         }
+      };
+      this.inbox = (flag) => {
+         this.setState({
+            sent: false,
+            draft: false,
+            mails: [],
+            status: 'loading...',
+            draftFlag: false,
+            sentFlag: false,
+         });
+         this.setState({
+            inboxSel: true,
+            sentSel: false,
+            draftSel: false,
+         });
+         if (flag) {
+            axios.get('/mails/mails').then((res) => {
+               console.log(res.data.Mails);
+               this.setState({
+                  allMails: res.data.Mails,
+               });
+               this.setInMail();
+            });
+         } else {
+            this.setInMail();
+         }
+      };
+      this.sent = (flag) => {
+         this.setState({
+            sent: true,
+            draft: true,
+            mails: [],
+            status: 'loading...',
+            draftFlag: false,
+            sentFlag: true,
+         });
+         this.setState({
+            inboxSel: false,
+            sentSel: true,
+            draftSel: false,
+         });
+         if (flag) {
+            axios.get('/mails/mails').then((res) => {
+               console.log(res.data.Mails);
+               this.setState({
+                  allMails: res.data.Mails,
+               });
+               this.setSentMail();
+            });
+         } else {
+            this.setSentMail();
+         }
+      };
+      this.drafts = (flag) => {
+         this.setState({
+            sent: true,
+            draft: true,
+            mails: [],
+            status: 'loading...',
+            draftFlag: true,
+            sentFlag: false,
+         });
+         this.setState({
+            inboxSel: false,
+            sentSel: false,
+            draftSel: true,
+         });
+         if (flag) {
+            axios.get('/drafts/drafts').then((res) => {
+               this.setState({
+                  allDrafts: res.data.Drafts,
+               });
+               this.setDraftMail();
+            });
+         } else {
+            this.setDraftMail();
          }
       };
    }
 
    componentDidMount() {
-      this.inbox();
+      axios.get('/mails/mails').then((res) => {
+         //console.log(res.data.Mails);
+         this.setState({
+            allMails: res.data.Mails,
+         });
+         axios.get('/drafts/drafts').then((res) => {
+            this.setState({
+               allDrafts: res.data.Drafts,
+            });
+            //console.log(this.state.allMails);
+            this.inbox();
+         });
+      });
    }
    render() {
       return (
@@ -314,7 +399,7 @@ export default class Home extends React.Component {
                            bgcolor={
                               mail.status === 'unread' && !this.state.draft
                                  ? 'white'
-                                 : '#D4D8E0'
+                                 : '#EBEBEB'
                            }
                            display='flex'
                            flexDirection='row'
@@ -330,7 +415,7 @@ export default class Home extends React.Component {
                               onClick={() => {
                                  var temp = this.state.mails;
                                  temp.find((e) => {
-                                    if (e.id === mail.id) {
+                                    if (e._id === mail._id) {
                                        if (e.status === 'unread') {
                                           e.status = 'read';
                                        }
@@ -339,22 +424,17 @@ export default class Home extends React.Component {
                                           mail: e,
                                           openCompose: true,
                                        });
-                                    }
-                                 });
-
-                                 var temp1 = JSON.parse(
-                                    localStorage.getItem('Mails')
-                                 );
-                                 temp1.find((e) => {
-                                    if (e.id === mail.id) {
-                                       if (e.status === 'unread') {
-                                          e.status = 'read';
-                                       }
-                                       if (!this.state.draft) {
-                                          localStorage.setItem(
-                                             'Mails',
-                                             JSON.stringify(temp1)
-                                          );
+                                       if (
+                                          !this.state.draftFlag &&
+                                          !this.state.sentFlag
+                                       ) {
+                                          axios
+                                             .post('/mails/edit-mail', {
+                                                _id: mail._id,
+                                             })
+                                             .then((res) => {
+                                                console.log(res.data);
+                                             });
                                        }
                                     }
                                  });
@@ -417,7 +497,7 @@ export default class Home extends React.Component {
                      height='200px'
                      fontSize='20px'
                   >
-                     <Box>EMPTY</Box>
+                     <Box>{this.state.status}</Box>
                   </Box>
                )}
             </Box>
@@ -451,6 +531,8 @@ export default class Home extends React.Component {
                      }
                      data={this.state.mail}
                      read={true}
+                     draft={this.state.draftFlag}
+                     sent={this.state.sentFlag}
                   />
                </DialogContent>
             </Dialog>

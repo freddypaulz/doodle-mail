@@ -87,7 +87,7 @@ export default function MenuDrawer(props) {
                         setInbox(true);
                         setSent(false);
                         setDrafts(false);
-                        props.inbox();
+                        props.inbox(false);
                      }}
                   >
                      <ListItemText primary='Inbox' />
@@ -105,7 +105,7 @@ export default function MenuDrawer(props) {
                         setInbox(false);
                         setSent(true);
                         setDrafts(false);
-                        props.sent();
+                        props.sent(false);
                      }}
                   >
                      <ListItemText primary='Sent mail' />
@@ -123,7 +123,7 @@ export default function MenuDrawer(props) {
                         setInbox(false);
                         setSent(false);
                         setDrafts(true);
-                        props.drafts();
+                        props.drafts(false);
                      }}
                   >
                      <ListItemText primary='Drafts' />
@@ -173,7 +173,21 @@ export default function MenuDrawer(props) {
             </DialogTitle>
             <DialogContent style={{ padding: '20px' }}>
                <Compose
-                  close={() => setOpenCompose(false)}
+                  close={(flag) => {
+                     setOpenCompose(false);
+                     if (flag) {
+                        setInbox(false);
+                        setSent(true);
+                        setDrafts(false);
+                        props.sent(false);
+                     } else {
+                        setInbox(false);
+                        setSent(false);
+                        setDrafts(true);
+                        props.drafts(false);
+                     }
+                     //
+                  }}
                   send={() => {
                      props.send();
                   }}
