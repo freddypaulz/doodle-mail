@@ -216,7 +216,7 @@ export default class Compose extends Component {
                      <EmojiEmotionsIcon style={{ fontSize: '20px' }} />
                   </IconButton>
                </Box>
-            ) : (
+            ) : !this.state.sent ? (
                <Box style={{ marginTop: '20px' }}>
                   <Button
                      size='small'
@@ -240,7 +240,7 @@ export default class Compose extends Component {
                      Reply
                   </Button>
                </Box>
-            )}
+            ) : null}
          </Box>
       );
    }

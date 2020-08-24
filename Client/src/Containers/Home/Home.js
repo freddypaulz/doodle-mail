@@ -135,7 +135,7 @@ export default class Home extends React.Component {
             });
          }
       };
-      this.inbox = (flag) => {
+      this.inbox = () => {
          this.setState({
             sent: false,
             draft: false,
@@ -149,19 +149,15 @@ export default class Home extends React.Component {
             sentSel: false,
             draftSel: false,
          });
-         if (flag) {
-            axios.get('/mails/mails').then((res) => {
-               console.log(res.data.Mails);
-               this.setState({
-                  allMails: res.data.Mails,
-               });
-               this.setInMail();
+         axios.get('/mails/mails').then((res) => {
+            console.log(res.data.Mails);
+            this.setState({
+               allMails: res.data.Mails,
             });
-         } else {
             this.setInMail();
-         }
+         });
       };
-      this.sent = (flag) => {
+      this.sent = () => {
          this.setState({
             sent: true,
             draft: true,
@@ -175,19 +171,15 @@ export default class Home extends React.Component {
             sentSel: true,
             draftSel: false,
          });
-         if (flag) {
-            axios.get('/mails/mails').then((res) => {
-               console.log(res.data.Mails);
-               this.setState({
-                  allMails: res.data.Mails,
-               });
-               this.setSentMail();
+         axios.get('/mails/mails').then((res) => {
+            console.log(res.data.Mails);
+            this.setState({
+               allMails: res.data.Mails,
             });
-         } else {
             this.setSentMail();
-         }
+         });
       };
-      this.drafts = (flag) => {
+      this.drafts = () => {
          this.setState({
             sent: true,
             draft: true,
@@ -201,16 +193,12 @@ export default class Home extends React.Component {
             sentSel: false,
             draftSel: true,
          });
-         if (flag) {
-            axios.get('/drafts/drafts').then((res) => {
-               this.setState({
-                  allDrafts: res.data.Drafts,
-               });
-               this.setDraftMail();
+         axios.get('/drafts/drafts').then((res) => {
+            this.setState({
+               allDrafts: res.data.Drafts,
             });
-         } else {
             this.setDraftMail();
-         }
+         });
       };
    }
 
@@ -356,7 +344,17 @@ export default class Home extends React.Component {
                         Starred
                      </MenuItem>
                   </Menu>
-                  <IconButton>
+                  <IconButton
+                     onClick={() => {
+                        if (this.state.inboxSel === true) {
+                           this.inbox();
+                        } else if (this.state.sentSel === true) {
+                           this.sent();
+                        } else {
+                           this.drafts();
+                        }
+                     }}
+                  >
                      <RefreshIcon style={{ fontSize: '20px' }} />
                   </IconButton>
                </Box>

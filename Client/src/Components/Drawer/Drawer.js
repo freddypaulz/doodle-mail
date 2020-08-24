@@ -179,14 +179,13 @@ export default function MenuDrawer(props) {
                         setInbox(false);
                         setSent(true);
                         setDrafts(false);
-                        props.sent(false);
+                        props.sent(true);
                      } else {
                         setInbox(false);
                         setSent(false);
                         setDrafts(true);
-                        props.drafts(false);
+                        props.drafts(true);
                      }
-                     //
                   }}
                   send={() => {
                      props.send();

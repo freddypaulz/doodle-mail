@@ -151,11 +151,11 @@ export default function ButtonAppBar(props) {
                                       );
                                       setUser(e);
                                       if (props.inboxSel) {
-                                         props.inbox();
+                                         props.inbox(true);
                                       } else if (props.sentSel) {
-                                         props.sent();
+                                         props.sent(true);
                                       } else {
-                                         props.drafts();
+                                         props.drafts(true);
                                       }
                                    }}
                                 >
